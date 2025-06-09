@@ -6,7 +6,7 @@
 /*   By: psantos- <psantos-@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/07 11:32:44 by psantos-          #+#    #+#             */
-/*   Updated: 2025/06/09 11:04:45 by psantos-         ###   ########.fr       */
+/*   Updated: 2025/06/09 11:33:00 by psantos-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -61,5 +61,6 @@ int	main(int argc, char *argv[])
 	while (*argv[2])
 		send_char((pid_t)ft_atoi(argv[1]), *argv[2]++);
 	send_char((pid_t)ft_atoi(argv[1]), '\0');
-	return (0);
+	while (1)
+		pause();
 }
