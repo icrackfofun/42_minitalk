@@ -1,23 +1,24 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   server.c                                           :+:      :+:    :+:   */
+/*   server_bonus.c                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: psantos- <psantos-@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/06/07 11:56:39 by psantos-          #+#    #+#             */
-/*   Updated: 2025/06/09 11:12:12 by psantos-         ###   ########.fr       */
+/*   Created: 2025/06/09 11:00:24 by psantos-          #+#    #+#             */
+/*   Updated: 2025/06/09 11:10:49 by psantos-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include <signal.h>
 #include <unistd.h>
 
-void	handle_signal(int sig)
+void	handle_signal(int sig, siginfo_t *info, void *context)
 {
 	static int				bit_index = 0;
 	static unsigned char	current_char = 0;
 
+	(void)context;
 	if (sig == SIGUSR2)
 		current_char |= (1 << (7 - bit_index));
 	bit_index++;
@@ -25,7 +26,10 @@ void	handle_signal(int sig)
 	{
 		write(1, &current_char, 1);
 		if (current_char == '\0')
+		{
 			write(1, "\n", 1);
+			kill(info->si_pid, SIGUSR2);
+		}
 		bit_index = 0;
 		current_char = 0;
 	}
@@ -48,8 +52,8 @@ int	main(void)
 	write(1, "Server PID: ", 12);
 	ft_putnbr(getpid());
 	write(1, "\n", 1);
-	sa.sa_handler = &handle_signal;
-	sa.sa_flags = 0;
+	sa.sa_sigaction = &handle_signal;
+	sa.sa_flags = SA_SIGINFO;
 	sigemptyset(&sa.sa_mask);
 	sigaction(SIGUSR1, &sa, NULL);
 	sigaction(SIGUSR2, &sa, NULL);

@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   client.c                                           :+:      :+:    :+:   */
+/*   client_bonus.c                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: psantos- <psantos-@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/07 11:32:44 by psantos-          #+#    #+#             */
-/*   Updated: 2025/06/09 11:16:03 by psantos-         ###   ########.fr       */
+/*   Updated: 2025/06/09 11:04:45 by psantos-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -42,10 +42,22 @@ void	send_char(pid_t server_pid, char c)
 	}
 }
 
+void	ack_handler(int sig)
+{
+	if (sig == SIGUSR2)
+		write(1, "ACK\n", 4);
+}
+
 int	main(int argc, char *argv[])
 {
+	struct sigaction	sa;
+
 	if (argc != 3)
 		return (0);
+	sa.sa_handler = ack_handler;
+	sigemptyset(&sa.sa_mask);
+	sa.sa_flags = 0;
+	sigaction(SIGUSR2, &sa, NULL);
 	while (*argv[2])
 		send_char((pid_t)ft_atoi(argv[1]), *argv[2]++);
 	send_char((pid_t)ft_atoi(argv[1]), '\0');
